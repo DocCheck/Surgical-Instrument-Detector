@@ -1,0 +1,6 @@
+train: data/dataset/Rona_dataset_final_single_multi_fit/train/images
+val: data/dataset/Rona_dataset_final_single_multi_fit/valid/images
+#test: data/dataset/Rona_dataset_final_single_multi_fit/test/images
+
+nc: 12
+names: ['Anatomische Pinzette Standard', 'Anatomische Pinzette schlank', 'Chirurgische Pinzette', 'Splitterpinzette', 'Skalpellgriff Nr.3', 'Skalpellgriff Nr.4', 'Skalpell geballt', 'Skalpell schmal', 'Chirurgische Schere spitz/spitz', 'Chirurgische Schere spitz/stumpf', 'Praeparierschere Standard', 'Praepariernadel']
