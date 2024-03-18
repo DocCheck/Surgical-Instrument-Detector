@@ -1,7 +1,7 @@
 # Surgical instrument detector
 The surgical instrument detector project allows you to train a YOLO5 model to detect surgical instruments using the Rona ataset.
 
-This repository can be used in a [Rona](https://gitlab.intranet.doccheck.ag/rd/Robot-xArm-Development) setup.  
+This repository can be used in a [Rona](https://github.com/DocCheck/Rona) setup.  
 
 ![inference.jpg](images%2Finference.jpg)
 
@@ -12,7 +12,7 @@ Germany, but also around the world. Rona's development is dedicated to create an
 software upgrade for surgery procedures and interventions where an additional hand is required, but a human support
 might not be available.
 
-The main GitHub repository for the Rona project: https://gitlab.intranet.doccheck.ag/rd/Robot-xArm-Development \
+The main GitHub repository for the Rona project: https://github.com/DocCheck/Rona\
 For further information visit also: https://more.doccheck.com/en/rona/ 
 [![Rona in Action](images/rona_action.jpg)](https://more.doccheck.com/en/rona/)
 
