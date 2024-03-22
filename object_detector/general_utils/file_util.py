@@ -72,7 +72,6 @@ def create_yolo_dataset(dir_path_input, dir_path_output, seed, desired_size):
     print(all_file_list)
     random.seed(seed)
     random.shuffle(all_file_list)
-    #all_file_list = all_file_list[:10]
     train_test_valid_prob = [0.8, 0.2, 0.0]
     n = len(all_file_list)
 
@@ -93,15 +92,12 @@ def create_yolo_dataset(dir_path_input, dir_path_output, seed, desired_size):
             img = read_image(input_img_file)
             (img_height, img_width, _) = np.shape(img)
             annot_list = read_annot(input_annot_file)
-            print(annot_list)
             obj_list = [bb[0] for bb in annot_list]
             bb_list = [bb[1] for bb in annot_list]
-            print(obj_list)
-            #print("***********************")
-            #print(obj_id, annot)
+
             # convert yolo annot to abs annot
             bb_list = bb_util.convert_yolo_bb_to_abs(bb_list, [img_width, img_height])
-            print(bb_list)
+
             # find the largest bbox contour including all bboxes
             bbox_l = bb_util.find_largest_contour(bb_list)
             print(bbox_l)
@@ -109,29 +105,20 @@ def create_yolo_dataset(dir_path_input, dir_path_output, seed, desired_size):
                 continue
 
             # crop image and get new annot
-            #print(obj_id, annot)
-            #new_img, new_annot_list = img_util.rnd_crop_img(img, bbox_l, bb_list, desired_size=desired_size)
             for m in range(5):
-                #m=4
                 new_img, new_annot_list = img_util.rnd_crop_img_bb_side_fit(img, bbox_l, bb_list, desired_size=desired_size, stride=50, mode=m)
-                #new_img, new_annot_list = img_util.rnd_crop_img(img, bbox_l, bb_list, desired_size=desired_size)
 
-                print(new_annot_list)
-                print(desired_size)
                 # convert back the abs annot to yolo annot
                 new_annot_list = bb_util.convert_abs_bb_to_yolo(new_annot_list, img_shape=[np.shape(new_img)[1], np.shape(new_img)[0]])
-                #test_annot = bb_util.convert_yolo_bb_to_abs(new_annot,desired_size)
                 print(obj_list, new_annot_list)
 
-                #print(obj_id, test_annot)
-                #bb_util.draw_bb(new_img, test_annot,'testtesttest'+input_img_file.split("/")[-1].split(".")[0])
 
                 # save the img and the new annot file
                 new_name = input_img_file.split("/")[-3] + "_" + input_img_file.split("/")[-1]
                 new_name = new_name.replace(".png", "_"+str(m)+".png")
                 output_img_file = os.path.join(current_output, "images") + "/" + new_name
                 output_annot_file = os.path.join(current_output, "labels") + "/" + new_name.replace(".png", ".txt")
-                write_image(new_img, output_img_file)
+                img_util.write_image(new_img, output_img_file)
                 write_annot([obj_list, new_annot_list], output_annot_file)
 
 
@@ -147,7 +134,6 @@ def create_yolo_dataset_2(dir_path_input, dir_path_output, seed, desired_size):
     all_file_list = make_list(dir_path_input)
     random.seed(seed)
     random.shuffle(all_file_list)
-    #all_file_list = all_file_list[:10]
     train_test_valid_prob = [0.8, 0.2, 0.0]
     n = len(all_file_list)
 
@@ -172,56 +158,32 @@ def create_yolo_dataset_2(dir_path_input, dir_path_output, seed, desired_size):
             print(annot_list)
             obj_list = [bb[0] for bb in annot_list]
             bb_list = [bb[1] for bb in annot_list]
-            print(obj_list)
 
-            #print("***********************")
-            #print(obj_id, annot)
-            print("#################" , bb_list)
-            # add padding to bb list (Optional)
-            #list_obj_id_with_padding = [0,1,2,3]
-            #for i in range(len(obj_list)):
-            #    if obj_list[i] in list_obj_id_with_padding:
-            #        bb_list[i] = bb_util.add_padding_yolo_bb(bb_list[i], [img_width, img_height],pad=50)
-            #print("#################" , bb_list)
             # convert yolo annot to abs annot
             bb_list = bb_util.convert_yolo_bb_to_abs(bb_list, [img_width, img_height])
-            #print(bb_list)
-            #exit(0)
+
             # find the largest bbox contour including all bboxes
             bbox_l = bb_util.find_largest_contour(bb_list)
-            #print(bbox_l)
             if bbox_l[2]>desired_size[0] or bbox_l[3]>desired_size[1]:
                 continue
 
             # crop image and get new annot
-            #print(obj_id, annot)
-            #new_img, new_annot_list = img_util.rnd_crop_img(img, bbox_l, bb_list, desired_size=desired_size)
             for i in range(len(obj_list)):
 
                 for m in range(5):
-                    #m=4
                     new_img, new_annot_list = img_util.rnd_crop_img_bb_side_fit(img, bb_list[i], [bb_list[i]], desired_size=desired_size, stride=100, mode=m)
-                    #new_img, new_annot_list = img_util.rnd_crop_img(img, bbox_l, bb_list, desired_size=desired_size)
-
-                    #print(new_annot_list)
-                    #print(desired_size)
                     # convert back the abs annot to yolo annot
                     new_annot_list = bb_util.convert_abs_bb_to_yolo(new_annot_list, img_shape=[np.shape(new_img)[1], np.shape(new_img)[0]])
-                    #test_annot = bb_util.convert_yolo_bb_to_abs(new_annot,desired_size)
-                    #print(obj_list, new_annot_list)
 
-                    #print(obj_id, test_annot)
-                    #bb_util.draw_bb(new_img, test_annot,'testtesttest'+input_img_file.split("/")[-1].split(".")[0])
+
 
                     # save the img and the new annot file
                     new_name = input_img_file.split("/")[-3] + "_" + input_img_file.split("/")[-1]
                     new_name = new_name.replace(".png", "_"+str(m)+"_"+str(i)+".png")
                     output_img_file = os.path.join(current_output, "images") + "/" + new_name
                     output_annot_file = os.path.join(current_output, "labels") + "/" + new_name.replace(".png", ".txt")
-                    write_image(new_img, output_img_file)
+                    img_util.write_image(new_img, output_img_file)
                     write_annot([[obj_list[i]], new_annot_list], output_annot_file)
-                    #exit(0)
-            #exit(0)
 
 
 def create_yolo_dataset_multi(dir_path_input, dir_path_output, seed, desired_size):
@@ -236,7 +198,6 @@ def create_yolo_dataset_multi(dir_path_input, dir_path_output, seed, desired_siz
     all_file_list = make_list(dir_path_input)
     random.seed(seed)
     random.shuffle(all_file_list)
-    #all_file_list = all_file_list[:10]
     train_test_valid_prob = [0.9, 0.1, 0.0]
     n = len(all_file_list)
     print(n)
@@ -260,41 +221,19 @@ def create_yolo_dataset_multi(dir_path_input, dir_path_output, seed, desired_siz
             img = read_image(input_img_file)
             (img_height, img_width, _) = np.shape(img)
             annot_list = read_annot(input_annot_file)
-            #print(annot_list)
             obj_list = [bb[0] for bb in annot_list]
             bb_list = [bb[1] for bb in annot_list]
-            #print(obj_list)
 
-            #print("***********************")
-            #print(obj_id, annot)
-            #print("#################" , bb_list)
-            # add padding to bb list (Optional)
-            #list_obj_id_with_padding = [0,1,2,3]
-            #for i in range(len(obj_list)):
-            #    if obj_list[i] in list_obj_id_with_padding:
-            #        bb_list[i] = bb_util.add_padding_yolo_bb(bb_list[i], [img_width, img_height],pad=50)
-            #print("#################" , bb_list)
             # convert yolo annot to abs annot
             bb_list = bb_util.convert_yolo_bb_to_abs(bb_list, [img_width, img_height])
-            #print(bb_list)
-            #exit(0)
-            # find the largest bbox contour including all bboxes
-            #bbox_l = bb_util.find_largest_contour(bb_list)
-            #print(bbox_l)
-            #if bbox_l[2]>desired_size[0] or bbox_l[3]>desired_size[1]:
-            #    continue
+
 
             # crop image and get new annot
-            #print(obj_id, annot)
-            #new_img, new_annot_list = img_util.rnd_crop_img(img, bbox_l, bb_list, desired_size=desired_size)
             for i in range(len(obj_list)):
-                #print("#######################     ", obj_list)
-                #print("#######################     " , obj_list[i])
+
                 candid_obj_list =  obj_list[i+1:]
-                #candid_obj_list.remove(obj_list[:i+1])
                 candid_bb_list =  bb_list[i+1:]
-                #print(candid_obj_list , candid_bb_list)
-                #candid_bb_list.remove(bb_list[:i+1])
+
                 for j in range(len(candid_obj_list)):
                     bbox_l = bb_util.find_largest_contour([bb_list[i], candid_bb_list[j]])
                     #print(bbox_l)
@@ -305,33 +244,18 @@ def create_yolo_dataset_multi(dir_path_input, dir_path_output, seed, desired_siz
                         final_obj_list = [obj_bb[0] for obj_bb in final_obj_bb]
                         final_bb_list = [obj_bb[1] for obj_bb in final_obj_bb]
                         for m in range(5):
-                            #m=4
-                            #print("§§§§§§§§§§§§§§§§", final_obj_bb)
-                            #print("§§§§§§§§§§§§§§§§" , bbox_l)
-                            #print("§§§§§§§§§§§§§§§§", final_bb_list)
-                            new_img, new_annot_list = img_util.rnd_crop_img_bb_side_fit(img, bbox_l, final_bb_list, desired_size=desired_size, stride=20, mode=m)
-                            #new_img, new_annot_list = img_util.rnd_crop_img(img, bbox_l, bb_list, desired_size=desired_size)
 
-                            #print(new_annot_list)
-                            #print(desired_size)
-                            #print(new_annot_list)
+                            new_img, new_annot_list = img_util.rnd_crop_img_bb_side_fit(img, bbox_l, final_bb_list, desired_size=desired_size, stride=20, mode=m)
+
                             # convert back the abs annot to yolo annot
                             new_annot_list = bb_util.convert_abs_bb_to_yolo(new_annot_list, img_shape=[np.shape(new_img)[1], np.shape(new_img)[0]])
-                            #test_annot = bb_util.convert_yolo_bb_to_abs(new_annot,desired_size)
-                            #print(obj_list, new_annot_list)
-                            #print(new_annot_list)
-                            #print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
-                            #print(obj_id, test_annot)
-                            #bb_util.draw_bb(new_img, test_annot,'testtesttest'+input_img_file.split("/")[-1].split(".")[0])
 
                             # save the img and the new annot file
                             new_name = input_img_file.split("/")[-3] + "_" + input_img_file.split("/")[-1]
                             new_name = new_name.replace(".png", "_"+str(i)+"_"+str(j)+"_"+str(m)+".png")
                             output_img_file = os.path.join(current_output, "images") + "/" + new_name
                             output_annot_file = os.path.join(current_output, "labels") + "/" + new_name.replace(".png", ".txt")
-                            write_image(new_img, output_img_file)
+                            img_util.write_image(new_img, output_img_file)
                             write_annot([final_obj_list, new_annot_list], output_annot_file)
-                    #exit(0)
-            #exit(0)
+
 
