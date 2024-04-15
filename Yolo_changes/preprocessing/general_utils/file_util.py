@@ -136,7 +136,7 @@ def generate_yolo_dataset_single_obj(dir_path_input, dir_path_output, padding=20
 
 
 def generate_yolo_dataset_multi_obj(dir_path_input, dir_path_output, padding=20, desired_size=[500, 500],
-                                    train_val_test=[0.7, 0.2, 0.1], seed=0):
+                                    train_val_test=[0.7, 0.2, 0.1], seed=0, bb_intersection_th=0.0):
     '''
     This function generates the dataset for pair of objects(tools) separately
     by finding the largest bounding box between two pairs in the original multi object image
@@ -146,6 +146,7 @@ def generate_yolo_dataset_multi_obj(dir_path_input, dir_path_output, padding=20,
     desired_size : maximum bounding box size (pixels)
     train_val_test : Train, Validation and Test proportion
     seed : Global random seed
+    bb_intersection_th : Intersection threshold to consider objects between two boxes
     '''
 
     if not os.path.exists(dir_path_output):
@@ -189,8 +190,14 @@ def generate_yolo_dataset_multi_obj(dir_path_input, dir_path_output, padding=20,
                     if bbox_l[2] > desired_size[0] or bbox_l[3] > desired_size[1]:
                         continue
                     else:
-                        final_obj_bb = [(obj_list[z], bb_list[z]) for z in range(len(obj_list)) if
-                                        bb_util.bb_intersection(bbox_l[:], bb_list[z][:])]
+                        if bb_intersection_th == 0.0:
+                            final_obj_bb = [(obj_list[z], bb_list[z]) for z in range(len(obj_list)) if
+                                            bb_util.bb_intersection(bbox_l[:], bb_list[z][:])]
+                        else:
+                            final_obj_bb = [(obj_list[z], bb_util.bb_intersection_value(bbox_l[:], bb_list[z][:])) for z
+                                            in range(len(obj_list))]
+                            final_obj_bb = [(obj_bb[0], obj_bb[1][0]) for obj_bb in final_obj_bb if
+                                            obj_bb[1][1] > bb_intersection_th]
                         final_obj_list = [obj_bb[0] for obj_bb in final_obj_bb]
                         final_bb_list = [obj_bb[1] for obj_bb in final_obj_bb]
                         # for each pair of objects in the image crop and generate 5 new images

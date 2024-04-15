@@ -101,6 +101,43 @@ def bb_intersection(boxA, boxB):
         return False
 
 
+def bb_intersection_value(boxA, boxB):
+    '''
+    This function finds the intersection between two bounding boxes in absolute format
+    boxA : bounding box 1
+    boxB : bounding box 2
+    return : 0 if boxA is completely inside boxB or vice versa, else the list of the intersection bb and
+    the intersection value
+    '''
+    boxAArea = round(boxA[2] * boxA[3], 2)
+    boxBArea = round(boxB[2] * boxB[3], 2)
+    # determine the (x, y)-coordinates of the intersection rectangle
+    bxA = [boxA[0], boxA[1], boxA[0] + boxA[2], boxA[1] + boxA[3]]
+    bxB = [boxB[0], boxB[1], boxB[0] + boxB[2], boxB[1] + boxB[3]]
+
+    xA = max(bxA[0], bxB[0])
+    yA = max(bxA[1], bxB[1])
+    xB = min(bxA[2], bxB[2])
+    yB = min(bxA[3], bxB[3])
+
+    # compute the area of intersection rectangle
+    interArea = round(max((xB - xA), 0) * max((yB - yA), 0), 2)
+    # print(interArea, boxAArea, boxBArea)
+    if interArea == 0:
+        return [[0], 0.0]
+    elif interArea == boxAArea:
+        return [boxA, 1.0]
+    elif interArea == boxBArea:
+        return [boxB, 1.0]
+    elif interArea < boxAArea and interArea < boxBArea:
+        if float(interArea / boxAArea) >= float(interArea / boxBArea):
+            return [[xA, yA, xB - xA, yB - yA], float(interArea / boxAArea)]
+        else:
+            return [[xA, yA, xB - xA, yB - yA], float(interArea / boxBArea)]
+    else:
+        return False
+
+
 def add_padding_yolo_bb(annot, img_shape, pad=4):
     '''
     This function adds extra padding to the bounding box
